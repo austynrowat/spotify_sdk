@@ -9,6 +9,7 @@ import 'enums/repeat_mode_enum.dart';
 import 'extensions/image_dimension_extension.dart';
 import 'models/capabilities.dart';
 import 'models/connection_status.dart';
+import 'models/access_token.dart';
 import 'models/crossfade_state.dart';
 import 'models/image_uri.dart';
 import 'models/library_state.dart';
@@ -46,6 +47,10 @@ class SpotifySdk {
   // connection status channel
   static const EventChannel _connectionStatusChannel =
       EventChannel(EventChannels.connectionStatus);
+
+  // access token channel
+  static const EventChannel _accessTokenChannel =
+      EventChannel(EventChannels.accessToken);
 
   //logging
   static final Logger _logger = Logger(
@@ -392,6 +397,27 @@ class SpotifySdk {
       rethrow;
     }
   }
+
+  /// Subscribes to the [AccessToken] and returns it.
+  ///
+  /// Throws a [PlatformException] if this fails
+  /// Throws a [MissingPluginException] if the method is not implemented on
+  /// the native platforms.
+  static Stream<AccessToken> subscribeAccessToken() {
+    try {
+      var accessTokenSubscription = _accessTokenChannel.receiveBroadcastStream();
+      return accessTokenSubscription.asyncMap((accessTokenJson) {
+        var accessTokenMap =
+            jsonDecode(accessTokenJson.toString()) as Map<String, dynamic>;
+        print("accesstokenrefreshed");
+        return AccessToken.fromJson(accessTokenMap);
+      });
+    } on Exception catch (e) {
+      _logException(MethodNames.subscribeAccessToken, e);
+      rethrow;
+    }
+  }
+
 
   /// Seeks the current track to the given [positionedMilliseconds]
   ///

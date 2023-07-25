@@ -20,6 +20,7 @@ import 'enums/repeat_mode_enum.dart';
 import 'models/album.dart';
 import 'models/artist.dart';
 import 'models/connection_status.dart';
+import 'models/access_token.dart';
 import 'models/image_uri.dart';
 import 'models/player_context.dart';
 import 'models/player_options.dart' as options;
@@ -70,6 +71,9 @@ class SpotifySdkPlugin {
   /// connection status event stream controller
   final StreamController connectionStatusEventController;
 
+  // access token event stream controller
+  final StreamController accessTokenEventController;
+
   /// Dio http client
   final Dio _dio = Dio(BaseOptions(
     baseUrl: 'https://api.spotify.com/v1/me/player',
@@ -92,7 +96,8 @@ class SpotifySdkPlugin {
       this.playerStateEventController,
       this.playerCapabilitiesEventController,
       this.userStateEventController,
-      this.connectionStatusEventController);
+      this.connectionStatusEventController,
+      this.accessTokenEventController);
 
   /// registers plugin method channels
   static void registerWith(Registrar registrar) {
@@ -120,13 +125,18 @@ class SpotifySdkPlugin {
         PluginEventChannel(EventChannels.connectionStatus);
     final connectionStatusEventController = StreamController.broadcast();
     connectionStatusEventChannel.setController(connectionStatusEventController);
+    const accessTokenEventChannel =
+        PluginEventChannel(EventChannels.accessToken);
+    final accessTokenEventController = StreamController.broadcast();
+    accessTokenEventChannel.setController(accessTokenEventController);
 
     final instance = SpotifySdkPlugin(
         playerContextEventController,
         playerStateEventController,
         playerCapabilitiesEventController,
         userStatusEventController,
-        connectionStatusEventController);
+        connectionStatusEventController,
+        accessTokenEventController);
 
     channel.setMethodCallHandler(instance.handleMethodCall);
   }
@@ -405,6 +415,10 @@ class SpotifySdkPlugin {
               refreshToken: newToken['refresh_token'] as String,
               expiry: (DateTime.now().millisecondsSinceEpoch / 1000).round() +
                   (newToken['expires_in'] as int));
+          accessTokenEventController.add(jsonEncode(AccessToken(
+            'Access Token Refreshed', '', '',
+            token_changed: true)
+          .toJson()));
           return _spotifyToken!.accessToken;
         }
       } else {

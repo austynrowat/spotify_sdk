@@ -53,12 +53,14 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
     private var capabilitiesChannel : EventChannel? = null
     private var userStatusChannel : EventChannel? = null
     private var connectionStatusChannel : EventChannel? = null
+    private var accessTokenChannel : EventChannel? = null
 
     private val playerContextSubscription = "player_context_subscription"
     private val playerStateSubscription = "player_state_subscription"
     private val capabilitiesSubscription = "capabilities_subscription"
     private val userStatusSubscription = "user_status_subscription"
     private val connectionStatusSubscription = "connection_status_subscription"
+    private val accessTokenSubscription = "access_token_subscription"
 
     //connecting
     private val methodConnectToSpotify = "connectToSpotify"
@@ -217,6 +219,7 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
         capabilitiesChannel = EventChannel(messenger, capabilitiesSubscription)
         userStatusChannel = EventChannel(messenger, userStatusSubscription)
         connectionStatusChannel = EventChannel(messenger, connectionStatusSubscription)
+        accessTokenChannel = EventChannel(messenger, accessTokenSubscription)
 
         connectionStatusChannel?.setStreamHandler(ConnectionStatusChannel(connStatusEventChannel))
     }
