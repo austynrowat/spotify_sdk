@@ -53,7 +53,7 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
     private var capabilitiesChannel : EventChannel? = null
     private var userStatusChannel : EventChannel? = null
     private var connectionStatusChannel : EventChannel? = null
-    private var accessTokenChannel : EventChannel? = null
+    private var accesstokenStatusChannel : EventChannel? = null
 
     private val playerContextSubscription = "player_context_subscription"
     private val playerStateSubscription = "player_state_subscription"
@@ -114,6 +114,7 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
     private val errorAuthenticationToken = "authenticationTokenError"
 
     private var connStatusEventChannel: SetEvent<ConnectionStatusChannel.ConnectionEvent> = event()
+    private var accesstokenStatusEventChannel: SetEvent<AccessTokenStatusChannel.AccessTokenEvent> = event()
 
     private val requestCodeAuthentication = 1337
 
@@ -139,12 +140,14 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
         capabilitiesChannel?.setStreamHandler(null)
         userStatusChannel?.setStreamHandler(null)
         connectionStatusChannel?.setStreamHandler(null)
+        accesstokenStatusChannel?.setStreamHandler(null)
 
         playerContextChannel = null
         playerStateChannel = null
         capabilitiesChannel = null
         userStatusChannel = null
         connectionStatusChannel = null
+        accesstokenStatusChannel = null
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -219,9 +222,11 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
         capabilitiesChannel = EventChannel(messenger, capabilitiesSubscription)
         userStatusChannel = EventChannel(messenger, userStatusSubscription)
         connectionStatusChannel = EventChannel(messenger, connectionStatusSubscription)
-        accessTokenChannel = EventChannel(messenger, accessTokenSubscription)
+        accesstokenStatusChannel = EventChannel(messenger, accessTokenSubscription)
 
         connectionStatusChannel?.setStreamHandler(ConnectionStatusChannel(connStatusEventChannel))
+        accesstokenStatusChannel?.setStreamHandler(AccessTokenStatusChannel(accesstokenStatusEventChannel))
+
     }
 
     //-- Method implementations
