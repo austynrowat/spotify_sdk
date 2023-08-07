@@ -343,6 +343,9 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
             val request = builder.build()
 
             AuthorizationClient.openLoginActivity(applicationActivity, requestCodeAuthentication, request)
+
+            accesstokenStatusEventChannel(AccessTokenStatusChannel.AccessTokenEvent(true, 'got access token', null, null))
+
         }
     }
 
