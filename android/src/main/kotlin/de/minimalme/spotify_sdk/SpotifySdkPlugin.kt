@@ -344,7 +344,7 @@ class SpotifySdkPlugin : MethodCallHandler, FlutterPlugin, ActivityAware, Plugin
 
             AuthorizationClient.openLoginActivity(applicationActivity, requestCodeAuthentication, request)
 
-            accesstokenStatusEventChannel(AccessTokenStatusChannel.AccessTokenEvent(true, 'got access token', null, null))
+            accesstokenStatusEventChannel(AccessTokenStatusChannel.AccessTokenEvent(true, "got access token", null, null))
 
         }
     }
