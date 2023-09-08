@@ -5,6 +5,7 @@ public class SwiftSpotifySdkPlugin: NSObject, FlutterPlugin {
 
     private var appRemote: SPTAppRemote?
     private var connectionStatusHandler: ConnectionStatusHandler?
+    private var accessTokenStatusHandler: AccessTokenStatusHandler?
     private var playerStateHandler: PlayerStateHandler?
     private var playerContextHandler: PlayerContextHandler?
     private static var playerStateChannel: FlutterEventChannel?
@@ -13,6 +14,7 @@ public class SwiftSpotifySdkPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let spotifySDKChannel = FlutterMethodChannel(name: "spotify_sdk", binaryMessenger: registrar.messenger())
         let connectionStatusChannel = FlutterEventChannel(name: "connection_status_subscription", binaryMessenger: registrar.messenger())
+        let accessTokenStatusChannel = FlutterEventChannel(name: "access_token_status_subscription", binaryMessenger: registrar.messenger())
         playerStateChannel = FlutterEventChannel(name: "player_state_subscription", binaryMessenger: registrar.messenger())
         playerContextChannel = FlutterEventChannel(name: "player_context_subscription", binaryMessenger: registrar.messenger())
 
@@ -23,6 +25,10 @@ public class SwiftSpotifySdkPlugin: NSObject, FlutterPlugin {
         instance.connectionStatusHandler = ConnectionStatusHandler()
 
         connectionStatusChannel.setStreamHandler(instance.connectionStatusHandler)
+
+        instance.accessTokenStatusHandler = AccessTokenStatusHandler()
+
+        accessTokenStatusChannel.setStreamHandler(instance.accessTokenStatusHandler)
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -80,6 +86,9 @@ public class SwiftSpotifySdkPlugin: NSObject, FlutterPlugin {
             connectionStatusHandler?.tokenResult = result
             let spotifyUri: String = swiftArguments[SpotifySdkConstants.paramSpotifyUri] as? String ?? ""
             
+            accessTokenStatusHandler?.tokenChanged = result // not really sure what flutter function the result points to, but it should to work
+            accessTokenStatusHandler.accessTokenReceived()
+
             do {
                 try connectToSpotify(clientId: clientID, redirectURL: url, spotifyUri: spotifyUri, asRadio: swiftArguments[SpotifySdkConstants.paramAsRadio] as? Bool, additionalScopes: swiftArguments[SpotifySdkConstants.scope] as? String)
             }
